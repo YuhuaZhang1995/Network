@@ -1,9 +1,10 @@
 import numpy as np
 import math
-from scipy.optimize import minimize
+import scipy.optimize as opt
 import sys
 import matplotlib.pyplot as plt
 import powerlaw
+import operator
 
 k_deg={}
 num_vertex=0
@@ -29,6 +30,7 @@ with open(filename) as infile:
 		else:
 			k_deg[int(tmp_node)]+=int(freq)
 
+'''
 count={}
 for i in k_deg.keys():
 	if k_deg[i] in count.keys():
@@ -36,7 +38,8 @@ for i in k_deg.keys():
 	else:
 		count[k_deg[i]]=1
 
-'''keys=np.array(list(dict.keys(count)))
+
+keys=np.array(list(dict.keys(count)))
 values=np.array(list(dict.values(count)))
 keys_log=np.array(list(map(math.log,(keys))))
 values_log=np.array(list(map(math.log,(values))))
@@ -45,12 +48,28 @@ plt.scatter(keys_log,values_log)
 plt.title('Outdegree of Node 1')
 plt.xlabel('log of degree')
 plt.ylabel('log of freq')
-plt.savefig('JP_outdegree.png')'''
+#plt.savefig('JP_outdegree.png')
+
 
 #Get the powerlaw estimates
-values=np.array(list(dict.values(count)))
-results=powerlaw.Fit(values)
+
+#y_data=values/sum(values)
+#print(y_data)
+def distribution(x, alpha, beta, x0):
+	return (x + x0)**alpha * np.exp(-beta *x)
+fit = opt.curve_fit(distribution, keys, values, maxfev=5000)
+print(fit[0])
+'''
+'''
+data = np.array(list(dict.values(k_deg))) # data can be list or numpy array
+results = powerlaw.Fit(data)
 print(results.power_law.alpha)
+'''
+
+#get the 10 nodes with largest outdegree
+print(sorted(k_deg, key=(lambda key:k_deg[key]), reverse=True)[:10])
+
+
 
 
 
