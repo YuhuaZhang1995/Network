@@ -1,0 +1,60 @@
+import numpy as np
+import math
+from scipy.optimize import minimize
+import sys
+import matplotlib.pyplot as plt
+import powerlaw
+
+k_deg={}
+num_vertex=0
+total_deg=0
+filename=sys.argv[1]
+with open(filename) as infile:
+	#count=1 #count the degree of vertex
+	tmp_node=-99.9
+	#rec_node=-99.9
+	remove_header=0
+	for line in infile:
+		remove_header=remove_header+1
+		curr_node=line.strip().split("\t")[0]
+		freq=line.strip().split("\t")[3]
+		#if change the sender, restart the loop
+		if tmp_node!=curr_node:
+			tmp_node=curr_node
+			#check the header was not counted
+			if remove_header!=1:
+				k_deg[int(tmp_node)]=int(freq)
+				
+		#if not change the sender
+		else:
+			k_deg[int(tmp_node)]+=int(freq)
+
+count={}
+for i in k_deg.keys():
+	if k_deg[i] in count.keys():
+		count[k_deg[i]]+=1
+	else:
+		count[k_deg[i]]=1
+
+'''keys=np.array(list(dict.keys(count)))
+values=np.array(list(dict.values(count)))
+keys_log=np.array(list(map(math.log,(keys))))
+values_log=np.array(list(map(math.log,(values))))
+#print(count)
+plt.scatter(keys_log,values_log)
+plt.title('Outdegree of Node 1')
+plt.xlabel('log of degree')
+plt.ylabel('log of freq')
+plt.savefig('JP_outdegree.png')'''
+
+#Get the powerlaw estimates
+values=np.array(list(dict.values(count)))
+results=powerlaw.Fit(values)
+print(results.power_law.alpha)
+
+
+
+
+
+
+
