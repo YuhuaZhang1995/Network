@@ -53,11 +53,11 @@ plt.ylabel('log of freq')
 
 #Get the powerlaw estimates
 
-#y_data=values/sum(values)
+y_data=values/sum(values)
 #print(y_data)
 def distribution(x, alpha, beta, x0):
 	return (x + x0)**alpha * np.exp(-beta *x)
-fit = opt.curve_fit(distribution, keys, values, maxfev=5000)
+fit = opt.curve_fit(distribution, keys, y_data, maxfev=5000)
 print(fit[0])
 '''
 '''
